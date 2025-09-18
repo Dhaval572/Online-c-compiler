@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/CompilerServlet")
 public class CompilerServlet extends HttpServlet 
 {
-    
     // Security patterns to detect potentially dangerous code
     private static final String[] DANGEROUS_PATTERNS = 
     {
