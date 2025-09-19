@@ -42,6 +42,7 @@ public class CompilerServlet extends HttpServlet
         
         String action = request.getParameter("action");
         String code = request.getParameter("code");
+        String input = request.getParameter("input"); // Get input parameter
         
         if (action == null || code == null) 
         {
@@ -62,10 +63,10 @@ public class CompilerServlet extends HttpServlet
         switch (action) 
 		{
             case "compile":
-                compileCode(code, out);
+                compileCode(code, input, out); // Pass input to compileCode as well (though not used)
                 break;
             case "run":
-                runCode(code, out);
+                runCode(code, input, out); // Pass input to runCode
                 break;
             default:
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -95,7 +96,7 @@ public class CompilerServlet extends HttpServlet
             || lower_code.contains("..\\"));
     }
     
-    private void compileCode(String code, PrintWriter out) 
+    private void compileCode(String code, String input, PrintWriter out) 
     {
         File temp_file = null;
         String file_name = null;
@@ -161,7 +162,13 @@ public class CompilerServlet extends HttpServlet
         }
     }
     
-    private void runCode(String code, PrintWriter out) 
+    // Overloaded method for backward compatibility
+    private void compileCode(String code, PrintWriter out) 
+    {
+        compileCode(code, null, out);
+    }
+    
+    private void runCode(String code, String input, PrintWriter out) 
     {
         File temp_file = null;
         String file_name = null;
@@ -209,6 +216,16 @@ public class CompilerServlet extends HttpServlet
             ProcessBuilder run_pb = new ProcessBuilder(base_name);
             run_pb.redirectErrorStream(true);
             Process run_process = run_pb.start();
+            
+            // Only send input if it's provided and not empty
+            if (input != null && !input.trim().isEmpty()) {
+                try (PrintWriter processInput = new PrintWriter(run_process.getOutputStream())) {
+                    processInput.print(input);
+                    processInput.flush();
+                }
+            }
+            // Close the output stream to signal end of input (important for programs that don't require input)
+            run_process.getOutputStream().close();
             
             // Set a timeout for execution (5 seconds)
             boolean b_finished = run_process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);

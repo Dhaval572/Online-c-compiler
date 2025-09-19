@@ -161,6 +161,38 @@
             line-height: 1.5;
         }
         
+        .input-container {
+            margin-top: 25px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-header {
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: #2c3e50;
+            font-size: 1.3rem;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+        
+        #program-input {
+            width: 100%;
+            min-height: 100px;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 14px;
+            padding: 15px;
+            border: 3px solid #f093fb;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            white-space: pre-wrap;
+            overflow-y: auto;
+            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
+            color: #333;
+            line-height: 1.5;
+        }
+        
         .status {
             margin: 15px 0;
             padding: 15px;
@@ -303,6 +335,10 @@ int main() {
             <button id="format-btn" class="btn btn-warning" onclick="formatCode()">
                 Format Code
             </button>
+            <!-- Add a button to load a sample program that requires input -->
+            <button id="sample-input-btn" class="btn btn-warning" onclick="loadSampleInputProgram()" style="background: linear-gradient(45deg, #f093fb, #f5576c);">
+                Load Sample Input Program
+            </button>
         </div>
         
         <div id="status" class="status"></div>
@@ -312,6 +348,17 @@ int main() {
                 Output:
             </div>
             <div id="output">Click "Compile" or "Run" to see the output...</div>
+        </div>
+        
+        <!-- Input section for programs that require user input -->
+        <div class="input-container">
+            <div class="input-header">
+                Program Input:
+            </div>
+            <textarea id="program-input" placeholder="Enter input for your program here (one value per line) if your program requires input..."></textarea>
+            <div style="margin-top: 10px; font-size: 0.9rem; color: #2c3e50; font-style: italic;">
+                Note: Only enter input if your program requires it (e.g., uses scanf). For programs that don't require input, leave this empty.
+            </div>
         </div>
         
         <div class="features">
@@ -326,6 +373,10 @@ int main() {
             <div class="feature-card">
                 <h3>Professional UI</h3>
                 <p>Clean and focused interface for coding</p>
+            </div>
+            <div class="feature-card">
+                <h3>User Input Support</h3>
+                <p>Provide input for programs that require user interaction</p>
             </div>
         </div>
         
@@ -466,6 +517,7 @@ int main() {
         
         function runCode() {
             const code = editor.getValue();
+            const input = document.getElementById('program-input').value || ""; // Send empty string if no input
             const outputDiv = document.getElementById('output');
             
             outputDiv.textContent = 'Running...';
@@ -475,7 +527,7 @@ int main() {
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'action=run&code=' + encodeURIComponent(code)
+                body: 'action=run&code=' + encodeURIComponent(code) + '&input=' + encodeURIComponent(input) // Include input in the request
             })
             .then(response => response.text())
             .then(data => {
@@ -500,6 +552,32 @@ int main() {
                 
             editor.setValue(formatted);
             showStatus('Code formatted successfully', true);
+        }
+        
+        // Function to load a sample program that requires user input
+        function loadSampleInputProgram() {
+            const sampleCode = `#include <stdio.h>
+
+int main() {
+    int age;
+    char name[100];
+    
+    printf("Enter your name: ");
+    fflush(stdout); // Important for web-based compilers
+    scanf("%s", name);
+    
+    printf("Enter your age: ");
+    fflush(stdout); // Important for web-based compilers
+    scanf("%d", &age);
+    
+    printf("Hello %s, you are %d years old.\\n", name, age);
+    
+    return 0;
+}`;
+            
+            editor.setValue(sampleCode);
+            document.getElementById('program-input').value = "John\n25";
+            showStatus('Sample input program loaded. Sample input has been pre-filled. Programs without scanf() will run without input.', true);
         }
     </script>
 </body>
