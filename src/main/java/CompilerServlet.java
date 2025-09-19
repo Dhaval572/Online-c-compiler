@@ -217,47 +217,42 @@ public class CompilerServlet extends HttpServlet
             run_pb.redirectErrorStream(true);
             Process run_process = run_pb.start();
             
-            // Only send input if it's provided and not empty
+            // If input is provided, send it to the program
             if (input != null && !input.trim().isEmpty()) {
-                try (PrintWriter processInput = new PrintWriter(run_process.getOutputStream())) {
+                try (PrintWriter processInput = new PrintWriter(run_process.getOutputStream(), true)) {
                     processInput.print(input);
                     processInput.flush();
                 }
             }
-            // Close the output stream to signal end of input (important for programs that don't require input)
+            // Close the output stream to signal end of input
             run_process.getOutputStream().close();
             
-            // Set a timeout for execution (5 seconds)
-            boolean b_finished = run_process.waitFor(5, java.util.concurrent.TimeUnit.SECONDS);
+            // Set a timeout for execution (10 seconds for interactive programs)
+            boolean finished = run_process.waitFor(10, java.util.concurrent.TimeUnit.SECONDS);
             
-            if (!b_finished) 
-            {
+            if (!finished) {
                 run_process.destroyForcibly();
-                out.println("Error: Program execution timed out (5 seconds limit)");
-            } 
-            else 
+                out.println("Error: Program execution timed out (10 seconds limit)");
+                return;
+            }
+            
+            // Read the program output
+            StringBuilder run_output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(run_process.getInputStream()))) 
             {
-                // Read the program output
-                StringBuilder run_output = new StringBuilder();
-                try (BufferedReader reader = new BufferedReader(new InputStreamReader(run_process.getInputStream()))) 
+                String line;
+                while ((line = reader.readLine()) != null) 
                 {
-                    String line;
-                    while ((line = reader.readLine()) != null) 
-                    {
-                        run_output.append(line).append("\n");
-                    }
+                    run_output.append(line).append("\n");
                 }
-                
-                int run_exit_code = run_process.exitValue();
-                if (run_exit_code == 0) 
-                {
-                    out.println(run_output.toString());
-                } 
-                else 
-                {
-                    out.println("Program exited with code: " + run_exit_code);
-                    out.println(run_output.toString());
-                }
+            }
+            
+            int exit_code = run_process.exitValue();
+            if (exit_code == 0) {
+                out.println(run_output.toString());
+            } else {
+                out.println("Program exited with code: " + exit_code);
+                out.println(run_output.toString());
             }
         }
         catch (IOException | InterruptedException e) 
