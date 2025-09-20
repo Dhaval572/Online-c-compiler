@@ -9,31 +9,6 @@
   </welcome-file-list>
 
   <servlet>
-    <servlet-name>MyServlet</servlet-name>
-    <servlet-class>MyServlet</servlet-class>
-    <init-param>
-      <param-name>myname</param-name>
-      <param-value>Manthan</param-value>
-    </init-param>
-    <init-param>
-      <param-name>dbUrl</param-name>
-      <param-value>jdbc:mysql://localhost:3306/emp</param-value>
-    </init-param>
-    <init-param>
-      <param-name>dbUser</param-name>
-      <param-value>root</param-value>
-    </init-param>
-    <init-param>
-      <param-name>dbPassword</param-name>
-      <param-value></param-value>
-    </init-param>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>MyServlet</servlet-name>
-    <url-pattern>/MyServlet</url-pattern>
-  </servlet-mapping>
-
-  <servlet>
     <servlet-name>CompilerServlet</servlet-name>
     <servlet-class>CompilerServlet</servlet-class>
   </servlet>
