@@ -182,7 +182,16 @@
             border: 1px solid var(--glass-border);
             position: relative;
         }
-
+        
+        .CodeMirror {
+            font-size: 16px !important;
+            line-height: 1.5 !important;
+        }
+        
+        .CodeMirror-linenumber {
+            font-size: 16px !important;
+        }
+        
         .controls-section {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -636,6 +645,7 @@ int main() {
                 indentUnit: 4,
                 tabSize: 4,
                 indentWithTabs: true,
+                fontSize: "16px",
                 extraKeys: {
                     "Ctrl-Space": "autocomplete",
                     "Ctrl-/": "toggleComment",

@@ -11,6 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         indentUnit: 4,
         tabSize: 4,
         indentWithTabs: true,
+        fontSize: "16px",
         extraKeys: {
             "Ctrl-Space": "autocomplete",
             "Ctrl-/": "toggleComment",
@@ -266,3 +267,7 @@ int main() {
     }
     showStatus('Sample program loaded. Enter input values in the input box.', true);
 }
+/*
+ * CodeMirror font size styles
+ */
+

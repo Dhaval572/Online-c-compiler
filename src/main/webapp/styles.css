@@ -171,7 +171,7 @@ h1 {
     width: 100%;
     min-height: 150px;
     font-family: 'Fira Code', 'Courier New', monospace;
-    font-size: 14px;
+    font-size: 16px;
     padding: 12px;
     border: 1px solid #4a90e2;
     border-radius: 4px;
@@ -199,6 +199,19 @@ h1 {
 
 #output {
     background: rgba(0, 15, 30, 0.9);
+}
+
+/*
+ * CodeMirror font size styles
+ */
+ 
+.CodeMirror {
+    font-size: 16px !important;
+    line-height: 1.5 !important;
+}
+
+.CodeMirror-linenumber {
+    font-size: 16px !important;
 }
 
 /* Scrollbar styling */
@@ -231,7 +244,7 @@ h1 {
     background: rgba(0, 0, 0, 0.3);
     border-radius: 4px;
     display: inline-block;
-    float: right;
+    margin-left: auto;
 }
 
 /* Input hints */
