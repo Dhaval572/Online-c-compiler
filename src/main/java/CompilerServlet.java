@@ -56,22 +56,23 @@ public class CompilerServlet extends HttpServlet
         {
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             out.println("Error: Code contains potentially dangerous operations and has been blocked for security reasons.");
-            return;
+            
         }
         
-        // Handle actions with simplified logic
-        switch (action) 
-		{
-            case "compile":
-                compileCode(code, input, out); // Pass input to compileCode as well (though not used)
-                break;
-            case "run":
-                runCode(code, input, out); // Pass input to runCode
-                break;
-            default:
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                out.println("Error: Invalid action. Use 'compile' or 'run'");
-                break;
+        // Handle compilation request
+        else if ("compile".equals(action)) 
+        {
+            compileCode(code, input, out);
+        }
+        // Handle execution request
+        else if ("run".equals(action)) 
+        {
+            runCode(code, input, out);
+        }
+        else 
+        {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            out.println("Error: Invalid action. Use 'compile' or 'run'");
         }
     }
     
@@ -160,12 +161,6 @@ public class CompilerServlet extends HttpServlet
                 new File(base_name + ".exe").delete(); // Windows executable extension
             }
         }
-    }
-    
-    // Overloaded method for backward compatibility
-    private void compileCode(String code, PrintWriter out) 
-    {
-        compileCode(code, null, out);
     }
     
     private void runCode(String code, String input, PrintWriter out) 

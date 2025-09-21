@@ -270,4 +270,3 @@ int main() {
 /*
  * CodeMirror font size styles
  */
-

@@ -176,7 +176,7 @@
         }
 
         #editor-wrapper {
-            border-radius: 16px;
+            border-radius: 0;
             overflow: hidden;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
             border: 1px solid var(--glass-border);
@@ -367,7 +367,7 @@
             line-height: 1.6;
             padding: 20px;
             border: 1px solid var(--glass-border);
-            border-radius: 16px;
+            border-radius: 0;
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(10px);
             color: var(--success);
@@ -388,6 +388,7 @@
         #program-input {
             color: var(--warning);
             min-height: 120px;
+            border-radius: 0;
         }
 
         #program-input::placeholder {
@@ -402,19 +403,19 @@
 
         #output::-webkit-scrollbar-track, #program-input::-webkit-scrollbar-track {
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 10px;
+            border-radius: 0;
         }
 
         #output::-webkit-scrollbar-thumb, #program-input::-webkit-scrollbar-thumb {
             background: linear-gradient(180deg, var(--accent-primary), var(--accent-secondary));
-            border-radius: 10px;
+            border-radius: 0;
         }
 
         .input-hints {
             margin-top: 20px;
             padding: 20px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 16px;
+            border-radius: 0;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
@@ -438,7 +439,7 @@
             margin-top: 15px;
             padding: 12px 20px;
             background: rgba(0, 0, 0, 0.3);
-            border-radius: 12px;
+            border-radius: 0;
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.85rem;
             color: var(--text-secondary);
@@ -494,7 +495,7 @@
             top: 30px;
             right: 30px;
             padding: 16px 24px;
-            border-radius: 16px;
+            border-radius: 0;
             backdrop-filter: blur(20px);
             color: white;
             font-weight: 600;
@@ -529,7 +530,7 @@
         .status {
             padding: 10px 15px;
             margin: 10px 0;
-            border-radius: 5px;
+            border-radius: 0;
             font-weight: bold;
             display: none;
             transition: opacity 0.3s ease;
