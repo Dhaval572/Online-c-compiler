@@ -16,7 +16,8 @@ document.addEventListener('DOMContentLoaded', function() {
             "Ctrl-/": "toggleComment",
             "Cmd-/": "toggleComment",
             "Shift-Tab": "indentLess",
-            "Tab": "indentMore"
+            "Tab": "indentMore",
+            "Ctrl-Enter": "runCodeWithInput"
         },
         hintOptions: {
             hint: CodeMirror.hint.anyword,
@@ -85,13 +86,39 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         CodeMirror.commands.autocomplete(editor, null, {completeSingle: false});
     });
+    
+    // Add line count tracking for output
+    const outputElement = document.getElementById('output');
+    const outputLinesElement = document.getElementById('output-lines');
+    
+    const updateOutputStats = function() {
+        const text = outputElement.textContent;
+        const lines = text.split('\n').length;
+        outputLinesElement.textContent = `Lines: ${lines}`;
+    };
+    
+    // Watch for changes in output
+    const observer = new MutationObserver(updateOutputStats);
+    observer.observe(outputElement, { childList: true, subtree: true, characterData: true });
+    
+    // Update stats initially
+    updateOutputStats();
 });
 
 function showStatus(message, isSuccess) {
     const statusDiv = document.getElementById('status');
+    const outputElement = document.getElementById('output');
+    const outputStatusElement = document.getElementById('output-status');
+    
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + (isSuccess ? 'success' : 'error');
     statusDiv.style.display = 'block';
+    
+    // Update output status
+    if (outputStatusElement) {
+        outputStatusElement.textContent = `Status: ${isSuccess ? 'Success' : 'Error'}`;
+        outputElement.className = isSuccess ? '' : 'error';
+    }
     
     // Hide status after 5 seconds
     setTimeout(() => {
@@ -99,10 +126,33 @@ function showStatus(message, isSuccess) {
     }, 5000);
 }
 
+function updateOutputState(state) {
+    const outputElement = document.getElementById('output');
+    outputElement.className = state;
+    
+    const outputStatusElement = document.getElementById('output-status');
+    if (outputStatusElement) {
+        switch(state) {
+            case 'compiling':
+                outputStatusElement.textContent = 'Status: Compiling...';
+                break;
+            case 'running':
+                outputStatusElement.textContent = 'Status: Running...';
+                break;
+            case 'error':
+                outputStatusElement.textContent = 'Status: Error';
+                break;
+            default:
+                outputStatusElement.textContent = 'Status: Ready';
+        }
+    }
+}
+
 function compileCode() {
     const code = window.editor.getValue();
     const outputDiv = document.getElementById('output');
     
+    updateOutputState('compiling');
     outputDiv.textContent = 'Compiling...';
     
     fetch('CompilerServlet', {
@@ -116,10 +166,12 @@ function compileCode() {
     .then(data => {
         outputDiv.textContent = data;
         showStatus('Compilation completed', !data.includes('error'));
+        updateOutputState(data.includes('error') ? 'error' : '');
     })
     .catch(error => {
         outputDiv.textContent = 'Error: ' + error;
         showStatus('Compilation failed', false);
+        updateOutputState('error');
     });
 }
 
@@ -129,6 +181,7 @@ function runCode() {
     const inputTextarea = document.getElementById('program-input'); // Get reference to input textarea
     const outputDiv = document.getElementById('output');
     
+    updateOutputState('running');
     outputDiv.textContent = 'Running...';
     
     fetch('CompilerServlet', {
@@ -142,35 +195,33 @@ function runCode() {
     .then(data => {
         outputDiv.textContent = data;
         showStatus('Execution completed', !data.includes('error'));
+        updateOutputState(data.includes('error') ? 'error' : '');
         // Clear the input textarea after running
         inputTextarea.value = "";
     })
     .catch(error => {
         outputDiv.textContent = 'Error: ' + error;
         showStatus('Execution failed', false);
+        updateOutputState('error');
         // Clear the input textarea even if there's an error
         inputTextarea.value = "";
     });
 }
 
-function formatCode() {
-    const code = window.editor.getValue();
-    // Simple formatting - in a real implementation, you might want to use a proper C formatter
-    let formatted = code
-        .replace(/\{\s*/g, "{\n    ")
-        .replace(/;\s*/g, ";\n    ")
-        .replace(/\s*\}/g, "\n}")
-        .replace(/\n\s*\n/g, "\n")
-        .trim();
-        
-    window.editor.setValue(formatted);
-    showStatus('Code formatted successfully', true);
+// New function to run code with Ctrl+Enter shortcut
+function runCodeWithInput() {
+    runCode();
 }
 
 // Function to clear the input textarea
 function clearInput() {
-    document.getElementById('program-input').value = "";
-    showStatus('Input cleared', true);
+    const inputTextarea = document.getElementById('program-input');
+    if (inputTextarea) {
+        inputTextarea.value = "";
+        showStatus('Input cleared successfully', true);
+    } else {
+        showStatus('Error: Could not find input element', false);
+    }
 }
 
 // Function to load a sample program that requires user input
@@ -197,6 +248,10 @@ int main() {
 }`;
 
     window.editor.setValue(sampleCode);
-    document.getElementById('program-input').value = ""; // Don't pre-fill input
-    showStatus('Sample program loaded. Enter input values separated by newlines (e.g., "10\\n20") in the input box.', true);
+    // Clear input but don't pre-fill with sample data
+    const inputTextarea = document.getElementById('program-input');
+    if (inputTextarea) {
+        inputTextarea.value = "";
+    }
+    showStatus('Sample program loaded. Enter input values in the input box.', true);
 }
