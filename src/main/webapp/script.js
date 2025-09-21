@@ -110,9 +110,15 @@ function showStatus(message, isSuccess) {
     const outputElement = document.getElementById('output');
     const outputStatusElement = document.getElementById('output-status');
     
+    // Clear any existing timeouts
+    if (window.statusTimeout) {
+        clearTimeout(window.statusTimeout);
+    }
+    
     statusDiv.textContent = message;
     statusDiv.className = 'status ' + (isSuccess ? 'success' : 'error');
     statusDiv.style.display = 'block';
+    statusDiv.style.opacity = '1';
     
     // Update output status
     if (outputStatusElement) {
@@ -120,9 +126,14 @@ function showStatus(message, isSuccess) {
         outputElement.className = isSuccess ? '' : 'error';
     }
     
-    // Hide status after 5 seconds
-    setTimeout(() => {
-        statusDiv.style.display = 'none';
+    // Hide status after 5 seconds with smooth animation
+    window.statusTimeout = setTimeout(() => {
+        statusDiv.style.opacity = '0';
+        
+        // Completely hide after fade out
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 300);
     }, 5000);
 }
 

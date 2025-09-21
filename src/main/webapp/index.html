@@ -491,12 +491,14 @@
             font-weight: 600;
             z-index: 1000;
             transform: translateX(400px);
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            opacity: 0;
         }
 
         .status-message.show {
             transform: translateX(0);
+            opacity: 1;
         }
 
         .status-message.success {
@@ -507,6 +509,33 @@
         .status-message.error {
             background: linear-gradient(135deg, var(--error), #cc3344);
             border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+
+        .status-message.hiding {
+            transform: translateX(400px) !important;
+            opacity: 0 !important;
+        }
+        
+        /* Legacy status */
+        .status {
+            padding: 10px 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+            transition: opacity 0.3s ease;
+        }
+        
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
         }
     </style>
 </head>
@@ -581,6 +610,7 @@ int main() {
         </div>
     </div>
 
+    <div id="status" class="status"></div>
     <div id="status-message" class="status-message"></div>
 
     <!-- CodeMirror JS -->
@@ -695,17 +725,32 @@ int main() {
             const statusDot = document.getElementById('status-dot');
             const outputStatus = document.getElementById('output-status');
             
+            // Reset any existing animations
+            statusMessage.classList.remove('show', 'hiding');
+            
+            // Force reflow to reset animation
+            void statusMessage.offsetWidth;
+            
             // Update status message
             statusMessage.textContent = message;
-            statusMessage.className = `status-message ${isSuccess ? 'success' : 'error'} show`;
+            statusMessage.className = `status-message ${isSuccess ? 'success' : 'error'}`;
             
             // Update status indicators
             statusDot.className = `status-dot ${isSuccess ? '' : 'error'}`;
             outputStatus.textContent = isSuccess ? 'Success' : 'Error';
             
-            // Hide status message after 4 seconds
+            // Show the message
+            requestAnimationFrame(() => {
+                statusMessage.classList.add('show');
+            });
+            
+            // Hide status message after 4 seconds with proper animation
             setTimeout(() => {
-                statusMessage.classList.remove('show');
+                statusMessage.classList.add('hiding');
+                // Remove the showing class after the hiding animation completes
+                setTimeout(() => {
+                    statusMessage.classList.remove('show', 'hiding');
+                }, 300); // Match the CSS transition duration
             }, 4000);
         }
 
